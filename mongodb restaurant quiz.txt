@@ -1,0 +1,24 @@
+1) All restaurants in borough (a town) "Brooklyn" and cuisine (a style of cooking) "Hamburgers".
+db.restaurants..find({borough: "Brooklyn", cuisine: "Hamburgers" }); // 35
+2)The number of restaurants in the borough "Brooklyn" and cuisine "Hamburgers".
+db.restaurants.countDocuments({ borough: "Brooklyn", cuisine: "Hamburgers" });
+3) All restaurants with zipcode 11225.
+db.restaurants.find({ "address.zipcode": "11225" }); //9
+4) Names of restaurants with zipcode 11225 that have at least one grade "C".
+db.restaurants.find({ "address.zipcode": "11225", "grades.grade": "C" },{ name: 1 }); //1
+{
+  _id: ObjectId('6839488c91a532e8ce30fdaf'),
+  name: "Vee'S Restaurant"
+}
+5) Names of restaurants with zipcode 11225 that have as first grade "C" and as second grade "A
+db.restaurants.find({"address.zipcode":"11225","grades":{ $elemMatch: { grade: "C" } },"grades":{ $elemMatch: { grade: "A" } } },{ name: 1 }); //9
+6) Names and streets of restaurants that don't have an "A" grade.
+db.restaurants.find({"grades.grade": {$ne: "A"}},{"name": 1, "address.street": 1, "_id": 0}) //13
+7) All restaurants with a grade C and a score greater than 50.
+db.restaurants.find({"grades": {$elemMatch: {"grade": "C","score": { $gt: 50 }}}}) //65
+8) All restaurants with a grade C or a score greater than 50.
+db.restaurants.find({$or: [{ "grades.grade": "C" },{ "grades.score": { $gt: 50 } }]}) //499
+9)  All restaurants that have only A grades.
+db.restaurants.find({"grades": {$not: {$elemMatch: { "grade": { $ne: "A" } }}}}) //1912
+10) A table with zipcode and number of restaurants that are in the borough "Queens" and have "Brazilian" cuisine.
+ db.restaurants.aggregate([{$match: {borough: "Queens",cuisine: "Brazilian"}},{$group: {_id: "$address.zipcode",count: { $sum: 1 }}}]) //0
